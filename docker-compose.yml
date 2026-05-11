@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    env_file: ./backend/.env
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      MONGO_URI: mongodb://admin:password@mongodb:27017/shopsphere?authSource=admin
+      REDIS_URL: redis://redis:6379
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    env_file: ./frontend/.env
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:5000/api/v1
+
+volumes:
+  mongo_data:
