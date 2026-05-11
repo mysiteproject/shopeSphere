@@ -90,7 +90,16 @@ app.all('*', (req, res) => {
 // Error Handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please set a different PORT in your .env file or stop the process using port ${PORT}.`);
+    process.exit(1);
+  }
+  throw err;
+});
+
 server.listen(PORT, () => {
   console.log(`🚀 ShopSphere API running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
 });
