@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import Link from 'next/link';
 import { Package, ChevronRight, Eye } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -20,6 +20,14 @@ const statusColors: Record<string, string> = {
 };
 
 export default function OrdersPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner fullPage text="Loading orders..." />}>
+      <OrdersContent />
+    </Suspense>
+  );
+}
+
+function OrdersContent() {
   const dispatch = useAppDispatch();
   const { orders, totalPages, page, loading } = useAppSelector((state) => state.order);
   const searchParams = useSearchParams();
